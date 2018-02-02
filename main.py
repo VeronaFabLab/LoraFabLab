@@ -68,7 +68,7 @@ while True:
 	time.sleep(1)
 	data = temp.read_temp_async() # Leggo la temperatura
 	print("{} --> {:.1f}".format(round(data,2), data)) # Arrotondo a due cifre decimali massime dopo la virgola
-	net = ("{:.1f}".format(str(data))).encode('utf-8') # Preparo la stringa da inviare
+	net = (str("{:.1f}".format(data))).encode('utf-8') # Preparo la stringa da inviare
 	s.send(net)
 	time.sleep(4)
 	rx, port = s.recvfrom(256) # Dovrebbe riconoscere una risposta dal gateway (?)
