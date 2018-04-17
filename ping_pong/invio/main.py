@@ -1,9 +1,12 @@
+"""
+Semplice ping-pong fra due LoPy in frequenza "locale"
+--INVIO
+"""
+
 from network import LoRa
 import socket
 import time
 import pycom
-
-''' PING - INVIO '''
 
 # Setup del socket
 lora = LoRa(mode=LoRa.LORA, frequency=868000000) # 868 MHz

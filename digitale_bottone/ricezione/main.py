@@ -1,10 +1,14 @@
+"""
+Ricezione lettura pressione di un bottone (0|1) in frequenza "locale" 
+inviata da un'altra board LoPy con accensione di led e buzzer
+--RICEZIONE
+"""
+
 from network import LoRa
 import socket
 import time
 import pycom
 from machine import PWM
-
-''' BOTTONE - RICEZIONE '''
 
 # PWM per output buzzer
 pwm= PWM(0, frequency= 3000)

@@ -1,5 +1,5 @@
 """ LoPy Board OTAA
-Lettura e invio temperatura da sensore DS18B20 a server TTN
+Invio stringa con indice variabile a server TTN
 """
 
 from network import LoRa
@@ -8,8 +8,6 @@ import binascii
 import struct
 import pycom
 import time
-from machine import Pin
-from onewire import DS18X20, OneWire # https://github.com/pycom/pycom-libraries/blob/master/examples/DS18X20/
 import custom_var # Soluzione per mantenere private le chiavi da GitHub
 
 # Inizializza LoRa in modalità LORAWAN
@@ -23,7 +21,7 @@ app_key = binascii.unhexlify(custom_var.app_key_code2)
 
 # Imposta i 3 canali di default alla stessa frequenza (must be before sending the OTAA join request)
 # Non servirebbe con l'attivazione OTAA, inoltre su firmware 1.0.0.b1 getta l'errore "Missing argument(s) value"
-lora.add_channel(index=0, frequency=868100000, dr_min=0, dr_max=5) # 868.1 MHz
+lora.add_channel(index=0, frequency=868100000, dr_min=0, dr_max=5)
 lora.add_channel(index=1, frequency=868100000, dr_min=0, dr_max=5)
 lora.add_channel(index=2, frequency=868100000, dr_min=0, dr_max=5)
 
@@ -61,21 +59,14 @@ s.setblocking(False)
 
 time.sleep(1)
 
-# DS18B20 cavo dati connesso al pin P10,
-ow = OneWire(Pin('P10')) # G17 dell'Expansion Board
-sens = DS18X20(ow) # Inizializza sensore
-
-while True:
-	sens.start_conversion() # Bisogna attendere almeno un secondo dopo questa istruzione
-	time.sleep(1)
-	data = sens.read_temp_async() # Leggo la temperatura
-	print("{} --> {:.1f}".format(round(data, 2), data)) # Arrotonda a due cifre decimali massime dopo la virgola
-	net = (str("{:.1f}".format(data))).encode('utf-8') # Codifica la stringa da inviare in bytes
-	s.send(net) # Finalmente invia
-	time.sleep(1)
-	rx, port = s.recvfrom(256) # Dovrebbe riconoscere una risposta dal gateway (?)
-	if rx: print('Received: {}, on port: {}'.format(rx, port))
-	time.sleep(298) # 5 minuti
+for i in range(100):
+    pkt = ('PKT #' + str(i)).encode('utf-8') # Codifica la stringa da inviare in bytes
+    print('Sending:', pkt) # Log su console
+    s.send(pkt) # Finalmente invia
+    time.sleep(1)
+    rx, port = s.recvfrom(256) # Dovrebbe riconoscere una risposta dal gateway (?)
+    if rx: print('Received: {}, on port: {}'.format(rx, port))
+    time.sleep(9)
 
 # https://github.com/pycom/pycom-libraries/blob/master/examples/loraNanoGateway/node/main.py
 # https://www.thethingsnetwork.org/docs/devices/lopy/usage.html#register-your-device-eui

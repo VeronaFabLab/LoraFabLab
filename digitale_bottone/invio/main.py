@@ -1,25 +1,27 @@
-# main.py -- put your code here!
+"""
+Invio lettura pressione di un bottone (0|1) in frequenza "locale" e
+ricezione su un'altra board LoPy con accensione di led e buzzer
+--INVIO
+"""
+
 from network import LoRa
 import socket
 import pycom
 import time
 from machine import Pin
 
-''' BOTTONE - INVIO '''
-
 # Setup del socket
 lora = LoRa(mode=LoRa.LORA, frequency=868000000) # 868 MHz
 s = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
 s.setblocking(False)
 
-# Ferma la pulsazione del led e lo spegne
-pycom.heartbeat(False)
+pycom.heartbeat(False) # Ferma la pulsazione del led e lo spegne
 pycom.rgbled(0x000000)
 
 # Configurazione PIN
 #adc = machine.ADC()
 #apin = adc.channel(pin='P16') # Pin fisico G3 (vedi pinout su slack)
-p_in = Pin("P10", mode=Pin.IN, pull=Pin.PULL_UP)
+p_in = Pin("P10", mode=Pin.IN, pull=Pin.PULL_UP) # Pin G17 Expansion Board
 
 while True:
 	time.sleep(0.05) # Attesa per evitare errore "EAGAIN" -> Velocità di trasmissione troppo elevata
@@ -28,4 +30,4 @@ while True:
 		pycom.rgbled(0xffffff) # Led acceso bianco
 	else:
 		s.send('0')
-		pycom.rgbled(0x000000) # Led spentos
+		pycom.rgbled(0x000000) # Led spento
