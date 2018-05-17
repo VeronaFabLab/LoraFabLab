@@ -107,7 +107,7 @@ void initialize_radio()
   while(!join_result) //Attende la connessione
   {
     Serial.println("Problemi di connessione a TTN,potrebbe non esserci segnale o i dati inseriti potrebbero non essere corretti");
-    delay(180000); //Aspetta 3 minuti prima di tentare una nuova connessione
+    delay(2500); //Aspetta 2.5 secondi prima di tentare una nuova connessione
     join_result = myLora.init();
   }
   Serial.println("Connesso a TTN correttamente");
@@ -127,7 +127,7 @@ void loop()
     myLora.tx(String(temperatura));
 
     led_off();
-    delay(2000);//mando ogni 2 secondi
+    delay(180000);//mando ogni 3 minuti
 }
 
 void led_on()
