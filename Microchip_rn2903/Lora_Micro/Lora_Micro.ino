@@ -1,16 +1,16 @@
 /* RN2483 LoRa OTAA
- *  
+ *
  * Comunicazione via LoRa usando il modulo LoRa RN2903 di Microchip
- * 
+ *
  * Sesnore di temperatura OneWire DS18B20
- * 
+ *
  * -------------------------------------------------------------------------
  * Arduino esegue il campionamento dal sensore e poi via seriale comunica
  * con il modulo per trasmettere a TTN i dati ottenuti
- * ------------------------------------------------------------------------- 
- * 
+ * -------------------------------------------------------------------------
+ *
  *  Pin di connessione tra la scheda RN2XX3 e Arduino:
- *  
+ *
  * RN2xx3 <--> Arduino
  * Uart TX <--> 10
  * Uart RX <--> 11
@@ -41,17 +41,17 @@ void setup()
 
   pinMode(13, OUTPUT);
   led_on();
-  
+
   //Dichiarazione delle porte seriali
-  
+
   Serial.begin(57600); //Porta seriale per la comunicazione con PC
   mySerial.begin(9600); //Porta seriale per la comunicazione con RN2483
   Serial.println("Startup");
 
   initialize_radio(); //inizializzo il modulo
   sensors.begin(); //inizializzo il sensore
-  
-  //Trasmissione di un messaggio di Setup 
+
+  //Trasmissione di un messaggio di Setup
   myLora.tx("TTN Mapper sul nodo TTN ");
 
   led_off();
@@ -107,7 +107,7 @@ void initialize_radio()
   while(!join_result) //Attende la connessione
   {
     Serial.println("Problemi di connessione a TTN,potrebbe non esserci segnale o i dati inseriti potrebbero non essere corretti");
-    delay(2500); //Aspetta 2.5 secondi prima di tentare una nuova connessione
+    delay(180000); //Aspetta 3 minuti prima di tentare una nuova connessione
     join_result = myLora.init();
   }
   Serial.println("Connesso a TTN correttamente");
@@ -117,12 +117,12 @@ void initialize_radio()
 void loop()
 {
     led_on();
-    Serial.print(" Recupero la temperatura..."); 
+    Serial.print(" Recupero la temperatura...");
     sensors.requestTemperatures(); //leggo la temperatura
 
     float temperatura = sensors.getTempCByIndex(0); //mi salvo in una variabile la teperatura rilevata
-    Serial.print("Temperatura: "+(String)temperatura); 
-    
+    Serial.print("Temperatura: "+(String)temperatura);
+
     Serial.println("--Trasmettendo-->");
     myLora.tx(String(temperatura));
 
@@ -139,4 +139,3 @@ void led_off()
 {
   digitalWrite(13, 0);
 }
-
