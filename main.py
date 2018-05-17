@@ -10,16 +10,16 @@ import pycom
 import time
 from machine import Pin
 from onewire import DS18X20, OneWire # https://github.com/pycom/pycom-libraries/blob/master/examples/DS18X20/
-import custom_var # Soluzione per mantenere private le chiavi da GitHub
+import custom_var # Soluzione momentanea per mantenere private le chiavi da GitHub
 
 # Inizializza LoRa in modalità LORAWAN
 lora = LoRa(mode=LoRa.LORAWAN)
 
 # Parametri per autenticazione OTAA
 # Chiavi fornite da console TTN
-dev_eui = binascii.unhexlify(custom_var.dev_eui_code2) # Non necessaria con OTAA (?)
-app_eui = binascii.unhexlify(custom_var.app_eui_code2)
-app_key = binascii.unhexlify(custom_var.app_key_code2)
+dev_eui = binascii.unhexlify(custom_var.dev_eui_code2) #0123456789ABCDEF
+app_eui = binascii.unhexlify(custom_var.app_eui_code2) #0123456789ABCDEF
+app_key = binascii.unhexlify(custom_var.app_key_code2) #0123456789ABCDEF0123456789ABCDEF
 
 # Imposta i 3 canali di default alla stessa frequenza (must be before sending the OTAA join request)
 # Non servirebbe con l'attivazione OTAA, inoltre su firmware 1.0.0.b1 getta l'errore "Missing argument(s) value"
@@ -47,11 +47,10 @@ for i in range(3, 16):
 
 # Creo un socket LoRa
 s = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
-
 # set the LoRaWAN data rate
 s.setsockopt(socket.SOL_LORA, socket.SO_DR, 4)
 
-# make the socket non-blocking
+# make the socket blocking
 # (waits for the data to be sent and for the 2 receive windows to expire)
 # s.setblocking(True)
 
@@ -69,16 +68,17 @@ while True:
 	sens.start_conversion() # Bisogna attendere almeno un secondo dopo questa istruzione
 	time.sleep(1)
 	data = sens.read_temp_async() # Leggo la temperatura
-	print("{} --> {:.1f}".format(round(data, 2), data)) # Arrotonda a due cifre decimali massime dopo la virgola
-	net = (str("{:.1f}".format(data))).encode('utf-8') # Codifica la stringa da inviare in bytes
-	s.send(net) # Finalmente invia
-	time.sleep(1)
-	rx, port = s.recvfrom(256) # Dovrebbe riconoscere una risposta dal gateway (?)
-	if rx: print('Received: {}, on port: {}'.format(rx, port))
-	time.sleep(298) # 5 minuti
-
-# https://github.com/pycom/pycom-libraries/blob/master/examples/loraNanoGateway/node/main.py
-# https://www.thethingsnetwork.org/docs/devices/lopy/usage.html#register-your-device-eui
-# https://docs.pycom.io/chapter/tutorials/lopy/lorawan-nano-gateway.html
-# https://www.thethingsnetwork.org/docs/devices/bytes.html
-# https://www.thethingsnetwork.org/wiki/LoRaWAN/Duty-Cycle#duty-cycle_maximum-duty-cycle
+	try: # Errore su format di un valore None se non è collegato un sensore
+		print("{} --> {:.1f}".format(round(data, 2), data)) # Arrotonda a due cifre decimali massime dopo la virgola
+		net = (str("{:.1f}".format(data))).encode('utf-8') # Codifica la stringa da inviare in bytes
+		s.send(net) # Finalmente invia
+		pycom.heartbeat(True)
+		time.sleep(1)
+		rx, port = s.recvfrom(256) # Dovrebbe riconoscere una risposta -> solo se socket.setblocking(True)
+		if rx: print('Received: {}, on port: {}'.format(rx, port))
+	except:
+		# Non è riuscito a leggere la temperatura
+		print("Sensore non collegato!")
+		pycom.heartbeat(False) # Necessario per impostare un colore led custom
+		pycom.rgbled(0xff0000) # Imposto led rosso per informazione visiva
+	time.sleep(298) # 5 minutis
