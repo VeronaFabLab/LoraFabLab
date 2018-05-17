@@ -95,8 +95,8 @@ void initialize_radio()
   /*
    * OTAA: initOTAA(String AppEUI, String AppKey);
    * Copiare i codici dati dalla console TTN in fondo alla pagina qui:*/
-const char *appEui = "70B3D57ED00096A6";
-const char *appKey = "C94BA7258716D9402CC3C8BFE2769911";
+  const char *appEui = "70B3D57ED000xxxx";
+  const char *appKey = "C94BA7258716D9402CC3C8BFE27xxxxx";
 
   Serial.println("appEui: "+(String)appEui);
   Serial.println("appKey: "+(String)appKey);
