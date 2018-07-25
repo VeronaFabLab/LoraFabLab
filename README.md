@@ -8,4 +8,4 @@ https://www.thethingsnetwork.org/docs/devices/lopy/usage.html#register-your-devi
 https://docs.pycom.io/chapter/tutorials/lopy/lorawan-nano-gateway.html
 https://www.thethingsnetwork.org/docs/devices/bytes.html https://www.thethingsnetwork.org/wiki/LoRaWAN/Duty-Cycle#duty-cycle_maximum-duty-cycle
 
-_4Ai - 2017/2018 - I.T.I. G. Marconi - Verona_
+_Riccardo Bussola, Federico Montagna, Federico Cucino, Marco Giacopuzzi - 2017/2018 - I.T.I. G. Marconi - Verona
